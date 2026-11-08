@@ -55,6 +55,12 @@ QUERIES = {
     "One customer's orders (point lookup)": """
         SELECT COUNT(*) FROM fact_sales WHERE customer_key = 100
     """,
+    "One product's sales (point lookup)": """
+        SELECT COUNT(*) FROM fact_sales WHERE product_key = 1
+    """,
+    "One day's sales (point lookup)": """
+        SELECT COUNT(*) FROM fact_sales WHERE date_key = 100
+    """,
     "Monthly revenue by country, from the fact table": """
         SELECT DATE_TRUNC('month', invoice_date)::date AS month, country, SUM(line_total) AS revenue
         FROM fact_sales

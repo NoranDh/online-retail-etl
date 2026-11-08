@@ -75,7 +75,7 @@ The partitions are created by `warehouse.py`, covering the months present in the
 
 PostgreSQL creates these on every partition automatically. Date filtering does not need its own index, because partition pruning already limits the rows read.
 
-Measured effect (see [query_plans.md](query_plans.md)): a single-customer lookup takes 9.8 ms with the indexes and 108 ms without. Aggregations over most of the table are not helped, because the planner reads the whole table faster than it could use an index.
+Measured effect (see [query_plans.md](query_plans.md)): a single-customer lookup takes about 1 to 10 ms with the index and about 107 ms without. The product and date lookups show the same pattern: 10.5 ms against 83 ms, and 7.2 ms against 110 ms. Aggregations over most of the table are not helped, because the planner reads the whole table faster than it could use an index.
 
 ## Materialized view: `mv_monthly_revenue`
 
