@@ -4,7 +4,16 @@ from datetime import datetime
 from pathlib import Path
 
 SCRIPTS_DIR = Path(__file__).resolve().parent
-STEPS = ["ingest.py", "clean.py", "transform.py", "warehouse.py", "data_quality.py", "archive.py", "performance.py"]
+STEPS = [
+    "ingest.py",
+    "clean.py",
+    "transform.py",
+    "quality_gate.py",
+    "warehouse.py",
+    "data_quality.py",
+    "archive.py",
+    "performance.py",
+]
 
 def main():
     for step in STEPS:

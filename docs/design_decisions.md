@@ -14,7 +14,7 @@ Measured counts come from [data_profile.md](data_profile.md).
 | Exact duplicates | 5,268 | Remove, keep one copy | The same invoice, product, quantity, time and customer, loaded twice. Keeping both would double count sales. |
 | Cancellations (`C` invoices) | 9,288 | Keep, add flag `is_cancelled` | They are real events. Keeping them lets totals reconcile. Revenue analysis filters them out. |
 | Zero or negative quantity | 10,624 | Keep, add flag | Some may overlap with cancellations; that overlap has not been measured yet. The flag covers these rows without guessing. |
-| Missing description | 1,454 | Keep, set description to `UNKNOWN` | The stock code still identifies the product, so the sale is still valid. |
+| Missing description | 1,454 | Keep, set description to `UNKNOWN` | The stock code still identifies the product, so the sale is still valid. In practice all 1,454 rows also have a zero price, so they are rejected by the price rule and the `UNKNOWN` rule never applies to this data. The rule stays in `clean.py` for future data. |
 | Extreme quantity (e.g. 80,995) | Not yet counted | Flag only, do not remove | A large quantity can be a real bulk order. The threshold for flagging is not decided yet. |
 
 ## Quarantine
@@ -56,11 +56,11 @@ Customer reconciliation for rows without a CustomerID:
 | Step | Rows |
 |---|---|
 | Raw rows with NULL customer_id | 135,080 |
-| Removed as duplicates (inferred from the difference) | 43 |
+| Removed as duplicates | 43 |
 | Rejected as zero or negative price | 2,472 |
 | Transformed rows with NULL customer_id | 132,565 |
 
-The 43 duplicates are inferred, not queried directly: 135,080 − 2,472 − 132,565 = 43. The 40 other rejected rows (2,512 − 2,472) have a CustomerID, so they don't appear in this table.
+The 43 duplicates were counted directly: among the raw rows with no CustomerID, 43 are exact copies of another row. This matches the difference, 135,080 − 2,472 − 132,565 = 43. The 40 other rejected rows (2,512 − 2,472) have a CustomerID, so they don't appear in this table.
 
 The raw table has 4,372 distinct customers, and the clean data has 4,371. The one missing customer (13256) has only one row, a zero-price line of 12,540 units, which was rejected. That customer has no valid sales, so they are not in `dim_customer`. The rejected row still holds the customer ID, so the customer can be traced.
 
@@ -102,6 +102,3 @@ Verification, comparing the output with the clean table:
 
 The script raises an error if any check fails, which rolls back the run.
 
-## Open questions
-
-- Which threshold, if any, triggers the flag for extreme quantities.

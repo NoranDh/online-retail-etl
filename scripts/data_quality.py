@@ -17,28 +17,20 @@ conn_params = dict(
     password=os.getenv("DB_PASSWORD"),
 )
 
+# Runs after warehouse.py and checks the warehouse tables themselves.
 # (name, query, rule, threshold): "min" means observed must be at least the threshold, "max" at most
 CHECKS = [
-    ("raw_rows_loaded", "SELECT COUNT(*) FROM raw_online_retail", "min", 500000),
-    ("rejected_rate_pct",
-     "SELECT 100.0 * COUNT(*) / (SELECT COUNT(*) FROM raw_online_retail) FROM rejected_rows",
-     "max", 1.0),
-    ("duplicate_rate_pct",
-     """SELECT 100.0 * ((SELECT COUNT(*) FROM raw_online_retail)
-                     - (SELECT COUNT(*) FROM clean_online_retail)
-                     - (SELECT COUNT(*) FROM rejected_rows))
-            / (SELECT COUNT(*) FROM raw_online_retail)""",
-     "max", 2.0),
-    ("missing_customer_pct",
+    ("fact_rows", "SELECT COUNT(*) FROM fact_sales", "min", 500000),
+    ("fact_rows_match_transformed",
+     """SELECT ABS((SELECT COUNT(*) FROM fact_sales)
+                - (SELECT COUNT(*) FROM transformed_online_retail))""",
+     "max", 0),
+    ("fact_missing_customer_pct",
      "SELECT 100.0 * COUNT(*) FILTER (WHERE customer_key IS NULL) / COUNT(*) FROM fact_sales",
      "max", 30.0),
-    ("unstandardized_stock_codes",
-     "SELECT COUNT(*) FROM transformed_online_retail WHERE stock_code <> UPPER(TRIM(stock_code))",
-     "max", 0),
     ("unknown_product_descriptions",
      "SELECT COUNT(*) FROM dim_product WHERE description = 'UNKNOWN'",
      "max", 50),
-    ("fact_rows", "SELECT COUNT(*) FROM fact_sales", "min", 500000),
 ]
 
 def main():

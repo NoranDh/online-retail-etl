@@ -110,10 +110,4 @@ FROM raw_online_retail;
 
 Result: 5,268 rows beyond the first copy of each distinct row.
 
-## Open items
 
-These were not measured yet. They should be checked before the cleaning script is final.
-
-- Whether the 2,515 zero-price rows are also cancellations, and how many have a missing CustomerID.
-- Extreme quantities (for example 80,995 units). No count has been taken for this.
-- The format of `customer_id` values (stored as text such as `17850.0`). The float suffix is handled in Step 3.
