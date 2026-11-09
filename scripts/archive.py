@@ -55,9 +55,17 @@ def main():
                 
                 )
         """)
+            cur.execute("ALTER TABLE archive_transformed ADD COLUMN IF NOT EXISTS is_outlier BOOLEAN")
             cur.execute("""
-                INSERT INTO archive_transformed
-                SELECT %s, now(), t.* FROM transformed_online_retail t
+                INSERT INTO archive_transformed (
+                    run_id, archived_at, invoice_no, stock_code, description, quantity,
+                    invoice_date, unit_price, customer_id, country, is_cancelled,
+                    has_nonpositive_quantity, loaded_at, is_outlier
+                )
+                SELECT %s, now(), t.invoice_no, t.stock_code, t.description, t.quantity,
+                       t.invoice_date, t.unit_price, t.customer_id, t.country, t.is_cancelled,
+                       t.has_nonpositive_quantity, t.loaded_at, t.is_outlier
+                FROM transformed_online_retail t
             """, (run_id,))
             cur.execute("SELECT COUNT(*) FROM archive_transformed WHERE run_id = %s", (run_id,))
             archived = cur.fetchone()[0]

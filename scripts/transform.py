@@ -32,7 +32,8 @@ with psycopg.connect(**conn_params) as conn:
                 country,
                 is_cancelled,
                 has_nonpositive_quantity,
-                loaded_at   
+                is_outlier,
+                loaded_at
         
         FROM clean_online_retail;
  """)

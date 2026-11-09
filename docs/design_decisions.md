@@ -15,7 +15,7 @@ Measured counts come from [data_profile.md](data_profile.md).
 | Cancellations (`C` invoices) | 9,288 | Keep, add flag `is_cancelled` | They are real events. Keeping them lets totals reconcile. Revenue analysis filters them out. |
 | Zero or negative quantity | 10,624 | Keep, add flag | Some may overlap with cancellations; that overlap has not been measured yet. The flag covers these rows without guessing. |
 | Missing description | 1,454 | Keep, set description to `UNKNOWN` | The stock code still identifies the product, so the sale is still valid. In practice all 1,454 rows also have a zero price, so they are rejected by the price rule and the `UNKNOWN` rule never applies to this data. The rule stays in `clean.py` for future data. |
-| Extreme quantity (e.g. 80,995) | Not yet counted | Flag only, do not remove | A large quantity can be a real bulk order. The threshold for flagging is not decided yet. |
+| Extreme quantity or price (e.g. 80,995 units) | About 1,200 flagged (0.23%) | Flag only (`is_outlier`), do not remove | A large quantity can be a real bulk order. The flag uses the IQR rule on a log scale with multiplier 3, so only extreme values are flagged. Rows are kept so revenue totals stay correct, and analysts can exclude flagged rows. |
 
 ## Quarantine
 

@@ -20,6 +20,7 @@ Each check compares an observed value with a threshold. A `min` check passes whe
 | `unknown_description_pct` | Share of transformed rows with description `UNKNOWN` | max | 1.0% | 0.0% (all 1,454 missing-description rows were rejected for zero price) |
 | `unstandardized_stock_codes` | Stock codes not uppercased and trimmed | max | 0 | 0 |
 | `unmapped_country_codes` | Rows still holding `EIRE` or `RSA` | max | 0 | 0 |
+| `outlier_rate_pct` | Share of clean rows flagged `is_outlier` | max | 5.0% | 0.23% |
 
 ## Post-load checks (`data_quality.py`)
 
