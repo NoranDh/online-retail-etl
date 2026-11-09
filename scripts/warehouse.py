@@ -95,6 +95,7 @@ with psycopg.connect(**conn_params) as conn:
                 line_total               NUMERIC(12,2) NOT NULL,
                 is_cancelled             BOOLEAN NOT NULL,
                 has_nonpositive_quantity BOOLEAN NOT NULL,
+                is_outlier               BOOLEAN NOT NULL,
                 PRIMARY KEY (sales_key, invoice_date)
             ) PARTITION BY RANGE (invoice_date);
 
@@ -118,7 +119,8 @@ with psycopg.connect(**conn_params) as conn:
         cur.execute("""
             INSERT INTO fact_sales (
                 invoice_no, invoice_date, date_key, customer_key, product_key,
-                country, quantity, unit_price, line_total, is_cancelled, has_nonpositive_quantity
+                country, quantity, unit_price, line_total, is_cancelled, has_nonpositive_quantity,
+                is_outlier
             )
             SELECT
                 t.invoice_no,
@@ -131,7 +133,8 @@ with psycopg.connect(**conn_params) as conn:
                 t.unit_price,
                 t.quantity * t.unit_price,
                 t.is_cancelled,
-                t.has_nonpositive_quantity
+                t.has_nonpositive_quantity,
+                t.is_outlier
             FROM transformed_online_retail t
             JOIN dim_date d ON d.full_date = t.invoice_date::date
             JOIN dim_product p ON p.stock_code = t.stock_code

@@ -17,7 +17,7 @@ These are improvements for a production version of this pipeline. The current ve
 
 ## Data quality
 
-8. **Price and quantity outliers.** Extreme quantities, such as 80,995 units, are not yet counted or flagged. Add a check for quantities above a chosen percentile and a review step for them.
+8. **Outlier review.** Outliers are flagged with `is_outlier` (0.23% of rows in the current run) and kept. Add a review step that lists the flagged rows by stock code and country, so someone can confirm whether they are bulk orders or errors.
 9. **Negative-price adjustments.** The two rows with stock code `B` ("Adjust bad debt") are quarantined. Confirm based on business logic whether adjustments should be reported separately rather than dropped.
 10. **Thresholds from history.** The current thresholds are fixed numbers. Once `dq_results` holds several runs, set them from the recent history instead, for example the mean plus or minus three standard deviations.
 11. **Alert delivery.** Alerts are a log line and a failed task. Send them to email or a chat channel so someone sees a failure without opening the log.

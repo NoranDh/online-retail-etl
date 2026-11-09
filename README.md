@@ -78,6 +78,30 @@ online-retail-de/
 └── requirements.txt
 ```
 
+## Requirement coverage
+
+| Requirement | Where |
+|---|---|
+| 1. Ingestion | `scripts/ingest.py`: CSV loaded as text with PostgreSQL `COPY` |
+| 2. Missing values | `clean.py`: missing descriptions set to `UNKNOWN`; missing CustomerID kept as NULL |
+| 2. Duplicates | `clean.py`: exact duplicates removed with `DISTINCT ON` |
+| 2. Outliers | `clean.py`: `is_outlier` flag, log-scale IQR rule with multiplier 3 |
+| 2. Integrity | `clean.py`, `transform.py`, `warehouse.py`: row count reconciliation at each step; `data_quality.py`: fact matches transformed |
+| 3. Transformation | `transform.py`: typed columns, uppercased stock codes, renamed countries |
+| 4. Warehouse design | `warehouse.py`: `fact_sales`, `dim_date`, `dim_customer`, `dim_product`; see `docs/schema.md` |
+| 5. ETL pipeline | `scripts/run_pipeline.py` runs all steps in order |
+| 5. Scheduling | Windows Task Scheduler, daily at 02:00; see `docs/pipeline.md` |
+| 6. Partitioning | `warehouse.py`: monthly range partitions on `invoice_date`, plus a default partition |
+| 6. Indexing | `warehouse.py`: indexes on `product_key`, `customer_key`, `date_key`; reasons in `docs/schema.md` |
+| 7. Quality monitoring | `quality_gate.py` before the load, `data_quality.py` after; results in `dq_results` |
+| 7. Alerts | A FAIL stops the run, writes a log line, and sets the scheduled task's status |
+| 8. Versioning | `archive.py`: one copy of the transformed data per run, tagged with `run_id` |
+| 8. Archiving | `archive_transformed`; old partitions can be detached (see `docs/schema.md`) |
+| 9. Metadata | `archive.py`: `metadata_catalog`; see `docs/schema.md` and `docs/pipeline.md` |
+| 10. Performance | `performance.py`: query plans in `docs/query_plans.md`; indexes; materialized view `mv_monthly_revenue` |
+| 10. Caching | Database level only: the materialized view. No application-level cache. |
+| 11. Deliverables | `scripts/`, `docs/`, `README.md` |
+
 ## Documentation
 
 - [Warehouse schema](docs/schema.md)

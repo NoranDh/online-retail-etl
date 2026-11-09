@@ -32,6 +32,7 @@ with psycopg.connect(**conn_params) as conn:
                 country                  TEXT,
                 is_cancelled             BOOLEAN,
                 has_nonpositive_quantity BOOLEAN, 
+                is_outlier               BOOLEAN,
                 loaded_at                TIMESTAMP
 
             );
@@ -75,10 +76,31 @@ with psycopg.connect(**conn_params) as conn:
                    country,
                    invoice_no LIKE 'C%',
                    quantity::numeric <= 0,
+                   FALSE,
                    loaded_at
             FROM deduped
             WHERE unit_price::numeric > 0;
 
+        """)
+
+        cur.execute("""
+            CREATE TEMP TABLE quartiles AS
+            SELECT
+                percentile_cont(0.25) WITHIN GROUP (ORDER BY ln(1 + abs(quantity::numeric))) AS q1_qty,
+                percentile_cont(0.75) WITHIN GROUP (ORDER BY ln(1 + abs(quantity::numeric))) AS q3_qty,
+                percentile_cont(0.25) WITHIN GROUP (ORDER BY ln(1 + abs(unit_price::numeric))) AS q1_price,
+                percentile_cont(0.75) WITHIN GROUP (ORDER BY ln(1 + abs(unit_price::numeric))) AS q3_price
+            FROM clean_online_retail;
+
+            UPDATE clean_online_retail c
+            SET is_outlier =
+                ln(1 + abs(c.quantity::numeric))
+                    NOT BETWEEN q.q1_qty - 3 * (q.q3_qty - q.q1_qty)
+                            AND q.q3_qty + 3 * (q.q3_qty - q.q1_qty)
+                OR ln(1 + abs(c.unit_price::numeric))
+                    NOT BETWEEN q.q1_price - 3 * (q.q3_price - q.q1_price)
+                            AND q.q3_price + 3 * (q.q3_price - q.q1_price)
+            FROM quartiles q;
         """)
 
         cur.execute("""

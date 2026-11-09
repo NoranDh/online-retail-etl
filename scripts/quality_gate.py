@@ -47,6 +47,9 @@ CHECKS = [
     ("unmapped_country_codes",
      "SELECT COUNT(*) FROM transformed_online_retail WHERE country IN ('EIRE', 'RSA')",
      "max", 0),
+    ("outlier_rate_pct",
+     "SELECT 100.0 * COUNT(*) FILTER (WHERE is_outlier) / COUNT(*) FROM clean_online_retail",
+     "max", 5.0),
 ]
 
 
