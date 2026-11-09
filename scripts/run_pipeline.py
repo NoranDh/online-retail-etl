@@ -13,6 +13,7 @@ STEPS = [
     "data_quality.py",
     "archive.py",
     "performance.py",
+    "lineage.py",
 ]
 
 def main():

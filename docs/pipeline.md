@@ -16,6 +16,7 @@ The pipeline loads the Kaggle Online Retail CSV into the `retail_dw` warehouse. 
 | 6 | `data_quality.py` | warehouse tables | `dq_results`, `logs/data_quality.log` | Runs four checks on the warehouse after the load and records the results. Fails the run if a check fails. |
 | 7 | `archive.py` | `transformed_online_retail` | `archive_transformed`, `metadata_catalog` | Copies the transformed data into the archive, tagged with the run ID, and refreshes the metadata catalog. |
 | 8 | `performance.py` | `fact_sales` | `mv_monthly_revenue`, `docs/query_plans.md` | Rebuilds the materialized view and records query plans with and without indexes. |
+| 9 | `lineage.py` | `archive_transformed`, all tables | `lineage` | Records each data movement for the run (source, target, transformation, row count). Runs last, so the materialized view exists. |
 
 ## Running it
 
@@ -47,6 +48,6 @@ The task's **Last Run Result** shows `(0x0)` when the run succeeded. Any other v
 
 ## Files
 
-- `scripts/ingest.py`, `clean.py`, `transform.py`, `quality_gate.py`, `warehouse.py`, `data_quality.py`, `archive.py`, `performance.py`: the pipeline steps.
+- `scripts/ingest.py`, `clean.py`, `transform.py`, `quality_gate.py`, `warehouse.py`, `data_quality.py`, `archive.py`, `lineage.py`, `performance.py`: the pipeline steps.
 - `scripts/run_pipeline.py`: runs the steps in order.
 - `.env`: database connection settings. Not committed to git.

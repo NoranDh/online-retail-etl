@@ -97,7 +97,7 @@ online-retail-de/
 | 7. Alerts | A FAIL stops the run, writes a log line, and sets the scheduled task's status |
 | 8. Versioning | `archive.py`: one copy of the transformed data per run, tagged with `run_id` |
 | 8. Archiving | `archive_transformed`; old partitions can be detached (see `docs/schema.md`) |
-| 9. Metadata | `archive.py`: `metadata_catalog`; see `docs/schema.md` and `docs/pipeline.md` |
+| 9. Metadata | `archive.py`: `metadata_catalog` (tables, sources, transformations, locations); `lineage.py`: `lineage` table with one row per data movement per run, with row counts; see `docs/schema.md` and `docs/pipeline.md` |
 | 10. Performance | `performance.py`: query plans in `docs/query_plans.md`; indexes; materialized view `mv_monthly_revenue` |
 | 10. Caching | Database level only: the materialized view. No application-level cache. |
 | 11. Deliverables | `scripts/`, `docs/`, `README.md` |
