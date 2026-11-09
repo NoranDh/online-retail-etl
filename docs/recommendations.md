@@ -5,7 +5,7 @@ These are improvements for a production version of this pipeline. The current ve
 ## Load and rebuild
 
 1. **Incremental loads.** The pipeline drops and rebuilds every table on each run. That works for 534,000 rows but takes longer as data grows. Load only new invoices, identified by invoice date or a source watermark, and merge them into the warehouse.
-2. **Run quality checks before publishing.** Today the warehouse is rebuilt before the checks run, so a bad load is visible in the warehouse even when it fails. Run the checks on the transformed data first, and only rebuild the warehouse if they pass.
+2. **Keep rejected batches for review.** When the quality gate fails, the run stops and the batch is only described in the log. Save the failing batch to a quarantine table so someone can inspect it before the next run.
 3. **Stable surrogate keys.** Customer and product keys are generated in a fixed order on each rebuild, so they can change between runs. Incremental loads need keys that never change for the same customer or product. Keep the keys in a persistent table and only add new ones.
 4. **Refresh the materialized view without locking.** The view is dropped and recreated on each run. Once loads are incremental, refresh it with `REFRESH MATERIALIZED VIEW CONCURRENTLY`, which needs the unique index that already exists.
 

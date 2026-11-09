@@ -58,8 +58,9 @@ A full run runs these scripts in order, and stops if one fails:
 | `ingest.py` | Load the CSV into `raw_online_retail` |
 | `clean.py` | Clean the data into `clean_online_retail` and `rejected_rows` |
 | `transform.py` | Convert types into `transformed_online_retail` |
+| `quality_gate.py` | Check the cleaned and transformed data before loading. Stops the run on failure. |
 | `warehouse.py` | Build the star schema |
-| `data_quality.py` | Run the quality checks and log the results |
+| `data_quality.py` | Check the warehouse after loading and log the results |
 | `archive.py` | Archive the run and update the metadata catalog |
 | `performance.py` | Rebuild the materialized view and record query plans |
 
@@ -69,11 +70,11 @@ To run it daily, schedule `scripts\run_pipeline.py` with Windows Task Scheduler.
 
 ```
 online-retail-de/
-├── data/raw/            the source CSV (not in git)
+├── data/raw/            the source CSV 
 ├── docs/                design and pipeline documentation
-├── logs/                data quality log (not in git)
+├── logs/                data quality log 
 ├── scripts/             pipeline scripts
-├── .env                 database settings (not in git)
+├── .env                 database settings 
 └── requirements.txt
 ```
 
